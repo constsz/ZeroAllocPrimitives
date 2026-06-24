@@ -4,6 +4,7 @@ namespace ZeroAllocPrimitives.Collections;
 
 /// <summary>
 /// FIFO (First-In, First-Out) cache with fixed-capacity, zero-allocation.
+/// A Key-Value dictionary useful for managing state, payloads, or network connections.
 /// This implementation uses a pre-allocated ring buffer and bounded dictionary
 /// to guarantee O(1) operations with strictly zero heap allocations after initialization.
 /// We avoid using LinkedList to track eviction order, because it allocates a new node on the heap for every insertion. 
