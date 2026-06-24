@@ -59,13 +59,13 @@ public class SnowflakeIdGeneratorTests
     }
     
     [Fact]
-    public void NextId_SequenceMask_ShouldProperlyWrapWithoutException()
+    public void NextId_WhenExceedingMaxSequence_ShouldSpinWaitUntilNextMillisecond()
     {
         // Act & Assert
         // We force 2000 generations in a tight loop. 
-        // Since the mask is 1023, the sequence WILL wrap around to 0 silently under the hood.
-        // We aren't testing uniqueness here (as exceeding 1024/ms guarantees a collision by design), 
-        // but rather that the bitwise AND (& 1023) prevents an OutOfRange exception or negative sequence.
+        // The hardware limit is 1024/ms. The new CAS spin-loop will safely
+        // yield the thread until the next millisecond, guaranteeing strict
+        // chronological ordering without throwing an exception.
         Action generate = () =>
         {
             for (int i = 0; i < 2000; i++)
