@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace ZeroAllocPrimitives.Identifiers;
 
@@ -17,7 +16,6 @@ public sealed class SnowflakeIdGenerator
     private static readonly SnowflakeIdGenerator _instance = new SnowflakeIdGenerator();
 
     // Unified state: Top 54 bits for Timestamp, Bottom 10 bits for Sequence.
-    // Replaces the naive '_counter' to prevent sequence wrapping bugs.
     private long _state = 0;
 
     // Singleton: Hide constructor (prevent calling 'new SnowflakeIdGenerator()')
@@ -44,7 +42,7 @@ public sealed class SnowflakeIdGenerator
             long currentSequence = currentState & 1023;
 
             // 2. Get real-world time
-        long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             long newSequence;
 
             // Handle clock drift / NTP backwards leaps safely
