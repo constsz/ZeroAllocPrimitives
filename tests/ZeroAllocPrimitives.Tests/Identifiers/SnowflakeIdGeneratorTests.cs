@@ -1,10 +1,47 @@
 ﻿using ZeroAllocPrimitives.Identifiers;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace ZeroAllocPrimitives.Tests.Identifiers;
 
 public class SnowflakeIdGeneratorTests
 {
+
+    private readonly ITestOutputHelper _output;
+    
+    public SnowflakeIdGeneratorTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+    
+    [Fact]
+    public void Sandbox()
+    {
+        long idFirst = 0;
+        long idLast = 0;
+        
+        int i = 0;
+        for (i = 0; i < 1024; i++)
+        {
+            long id = SnowflakeIdGenerator.Instance.NextId();
+
+            if (i == 0 || i == 1023)
+            {
+                _output.WriteLine($"Index: {i}");
+        
+                _output.WriteLine($"ID: {id}");
+                _output.WriteLine($"ID (Binary): {id:B}");                
+            }
+
+            if (i == 0) idFirst = id;
+            if (i == 1023) idLast = id;
+
+        }
+        
+        _output.WriteLine($"idLast - idFirst = {idLast - idFirst}");
+        
+    }
+    
     [Fact]
     public void NextId_MultiThreaded_ShouldNotProduceDuplicates()
     {
@@ -12,7 +49,7 @@ public class SnowflakeIdGeneratorTests
         // We limit to 1000 to respect the 1024/ms hardware limit of this specific implementation.
         // Proves that Interlocked.Increment safely prevents race conditions on the sequence counter.
         const int concurrentRequests = 1000;
-        var generatedIds = new long[concurrentRequests];
+        long[] generatedIds = new long[concurrentRequests];
 
         // Act
         // Simulate high-throughput concurrent access hitting 
@@ -33,7 +70,7 @@ public class SnowflakeIdGeneratorTests
     {
         // Arrange
         const int iterations = 1000;
-        var ids = new long[iterations];
+        long[] ids = new long[iterations];
 
         // Act
         for (int i = 0; i < iterations; i++)
